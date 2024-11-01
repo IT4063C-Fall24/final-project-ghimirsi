@@ -34,23 +34,26 @@
 # *What 3 data sources have you identified for this project?*
 # *How are you going to relate these datasets?*
 # 📝 <!-- Answer Below -->
-# 1. Kaggle (Cereal Dataset)
-# URL: Kaggle Cereal Dataset
-# Description: This dataset contains details on various cereals, including nutritional information, manufacturer, and ratings. It can be useful for analyzing brand popularity and health-related aspects of cereal consumption.
 # 
-# 2. Statista (Consumer Preferences and Marketing Data)
-# URL: Statista
-# Description: Statista provides a wide range of statistics on consumer preferences, marketing spend, and demographic insights across various industries, including cereals.
+# 1. Cereal Consumption Data (CSV):
+# https://www.kaggle.com/datasets/mhansraj/cereal-consumption
 # 
-# 3. U.S. Census Bureau (Demographic Data)
-# URL: U.S. Census Bureau
-# Description: The Census Bureau provides demographic data that can be useful to understand how age, income, and education impact cereal consumption trends.
+# 2. Cereal Popularity Data (CSV):
+# https://www.kaggle.com/datasets/yangshun/cereal-popularity
 # 
-# Merge on Demographic Factors:
-# I will merge the cereal consumption data with the demographic data using common attributes such as age group, income, or education level. By doing this, I will be able to understand the consumption patterns of different demographic groups and analyze how these factors influence preferences for various cereal products.
+# 3. U.S. Census Demographic Data (API):
+# https://api.census.gov/data.html
 # 
-# Relate by Time Period (Marketing Data):
-# To analyze the impact of marketing campaigns, I plan to relate the marketing data to the cereal consumption data over a shared time period (such as month or year). This will allow me to investigate whether higher marketing expenditures during certain periods correspond with increased sales or changes in consumption of particular cereals. This approach will help uncover any correlations between marketing strategies and consumer behavior.
+# To relate the datasets effectively, I will first merge the cereal consumption data with the cereal popularity data based on common demographic attributes such as age, income, and education level. This will allow for a deeper understanding of how different demographic groups consume various cereal brands. Next, I will integrate the U.S. Census demographic data by matching identifiers like age group and income range to enrich the analysis of consumption patterns. Additionally, I will assess the influence of marketing efforts by correlating historical marketing expenditures with changes in consumption over time, providing insights into the factors driving cereal consumption trends across demographics.
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
 
 # ## Approach and Analysis
 # *What is your approach to answering your project question?*
