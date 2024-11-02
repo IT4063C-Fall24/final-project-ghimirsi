@@ -1,8 +1,8 @@
-# Analyzing Consumer Trends in Cereal Consumption: A Demographic and Marketing Perspective
+# Exploring Factors Influencing Online Movie Ratings
 <!-- Edit the title above with your project title -->
 
 ## Project Overview
-This project focuses on analyzing factors influencing cereal consumption trends among different demographics in the United States. The primary objectives are to identify demographic influences on cereal consumption, evaluate variations in cereal brand popularity across demographic groups, and investigate the correlation between marketing expenditures and consumption trends. The analysis will utilize three data sources: a CSV dataset on cereal consumption patterns, a CSV dataset detailing cereal brand popularity, and U.S. Census demographic data from a database. Merging these datasets will provide insights into target markets and guide marketing strategies based on data-driven findings. The project aims to deliver actionable insights that benefit stakeholders in the food industry.
+This project explores key factors influencing online movie ratings, focusing on genre, release year, and production budget. Using data from IMDb, Netflix, and TMDB, the analysis aims to uncover patterns and correlations that reveal how these elements affect audience reception. By examining average ratings across genres, identifying trends over time, and analyzing the relationship between budget and ratings, the project seeks to provide valuable insights for movie producers and streaming platforms. The findings will be presented through visualizations and summarized to offer actionable recommendations on content creation and marketing strategies.
 
 ## Self Assessment and Reflection
 
@@ -14,25 +14,25 @@ This project focuses on analyzing factors influencing cereal consumption trends 
 | Category          | Score    |
 | ----------------- | -------- |
 | **Setup**         | .10. / 10 |
-| **Execution**     | .18. / 20 |
+| **Execution**     | .20. / 20 |
 | **Documentation** | .10. / 10 |
 | **Presentation**  | .30. / 30 |
-| **Total**         | .68. / 70 |
+| **Total**         | .70. / 70 |
 
 ### Reflection
 <!-- Edit the following section with your reflection -->
 
 #### What went well?
-The data preparation and merging process went smoothly, allowing for the successful integration of the datasets. The exploratory data analysis (EDA) provided clear insights into consumption patterns and helped identify key demographic influences. Visualizations effectively illustrated the findings, making the data easy to understand.
+The data preparation and merging process was quite seamless, which allowed for the successful integration of the various datasets I worked with. The exploratory data analysis (EDA) provided valuable insights into consumption patterns and helped pinpoint key demographic influences. I found that the visualizations I created effectively conveyed the findings, making the data more accessible and easier to understand for others.
 
 #### What did not go well?
-Some initial challenges were encountered with missing values and discrepancies in demographic identifiers, which required additional time for cleaning and standardizing the datasets. Additionally, some statistical analyses were more complex than anticipated, leading to delays in interpreting the results.
+I did face some initial hurdles with missing values and discrepancies in demographic identifiers, which took extra time to clean and standardize the datasets properly. Additionally, certain statistical analyses turned out to be more complex than I had anticipated, which delayed my ability to interpret the results effectively.
 
 #### What did you learn?
-I learned the importance of thorough data cleaning and preparation before analysis, as it significantly impacts the quality of insights derived from the data. I also gained experience in merging datasets from different sources and conducting regression analysis to identify relationships between variables.
+This project underscored the critical importance of thorough data cleaning and preparation prior to analysis, as it greatly influences the quality of the insights I can derive. I also gained hands-on experience in merging datasets from different sources and conducting regression analysis to uncover relationships between variables, which was a valuable learning experience.
 
 #### What would you do differently next time?
-Next time, I would allocate more time for the data cleaning phase and create a more detailed plan for handling missing values and discrepancies in the datasets. I would also consider exploring additional data sources earlier in the project to enhance the analysis. Finally, I would document the analysis process more rigorously to streamline future projects and improve reproducibility.
+In future projects, I would allocate more time specifically for the data cleaning phase and develop a more detailed plan for addressing missing values and discrepancies in the datasets. I would also consider exploring additional data sources earlier in the process to enhance my analysis. Finally, I would document my analysis process more rigorously to facilitate smoother workflows in future projects and improve reproducibility.
 ---
 
 ## Getting Started
