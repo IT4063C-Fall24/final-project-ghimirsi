@@ -8,6 +8,8 @@ ipykernel = "*"
 jupyter = "*"
 notebook = "*"
 black = "*"
+matplotlib = "*"
+seaborn = "*"
 
 [dev-packages]
 
