@@ -85,7 +85,21 @@
 # In[ ]:
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+imdb_data = pd.read_csv('imdb_top_1000.csv')
+imdb_data['Genre'] = imdb_data['Genre'].str.split(', ')
+imdb_data_exploded = imdb_data.explode('Genre')
+
+average_ratings = imdb_data_exploded.groupby('Genre')['IMDB_Rating'].mean().sort_values(ascending=False)
+unique_colors = sns.color_palette("husl", len(average_ratings))
+
+plt.figure(figsize=(12, 6))
+average_ratings.plot(kind='bar', color=unique_colors)
+plt.title('Average IMDB Ratings by Genre')
+plt.xlabel('Genre')
 
 
 # 2. Budget vs. Rating Correlation: Scatter Plot
@@ -95,7 +109,40 @@
 # In[ ]:
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
+netflix_df = pd.read_csv('netflix_titles.csv')
+imdb_df = pd.read_csv('imdb_top_1000.csv')
+netflix_ratings = netflix_df[['title', 'rating']].rename(columns={'rating': 'IMDb_Rating'})
+netflix_ratings['Platform'] = 'Netflix'
+
+imdb_ratings = imdb_df[['Series_Title', 'IMDB_Rating']].rename(columns={'Series_Title': 'title', 'IMDB_Rating': 'IMDb_Rating'})
+imdb_ratings['Platform'] = 'IMDb'
+
+combined_ratings = pd.concat([netflix_ratings, imdb_ratings], ignore_index=True)
+combined_ratings['IMDb_Rating'] = pd.to_numeric(combined_ratings['IMDb_Rating'], errors='coerce')
+
+print("Count of NaN ratings before cleaning:", combined_ratings['IMDb_Rating'].isna().sum())
+netflix_data = pd.read_csv('netflix_titles.csv')
+
+merged_data = netflix_data.merge(imdb_df, left_on='title', right_on='Series_Title', how='inner')
+merged_data['Gross'] = merged_data['Gross'].replace({'\$': '', ',': ''}, regex=True)  # Remove dollar sign and commas
+merged_data['Gross'] = pd.to_numeric(merged_data['Gross'], errors='coerce')  # Convert to numeric
+merged_data['IMDB_Rating'] = pd.to_numeric(merged_data['IMDB_Rating'], errors='coerce')
+
+
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=merged_data, x='Gross', y='IMDB_Rating', alpha=0.6)
+
+plt.title('Budget vs. IMDb Rating', fontsize=16)
+plt.xlabel('Production Budget (Gross)', fontsize=14)
+plt.ylabel('IMDb Rating', fontsize=14)
+plt.grid()
+
+plt.show()
 
 
 # 3. Ratings Over Time: Average IMDB Ratings Over Time
@@ -104,7 +151,25 @@
 # In[ ]:
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+imdb_data = pd.read_csv('imdb_top_1000.csv')
 
+imdb_data['Released_Year'] = pd.to_numeric(imdb_data['Released_Year'], errors='coerce')
+imdb_data['IMDB_Rating'] = pd.to_numeric(imdb_data['IMDB_Rating'], errors='coerce')
+imdb_data = imdb_data.dropna(subset=['Released_Year', 'IMDB_Rating'])
+
+average_ratings_by_year = imdb_data.groupby('Released_Year')['IMDB_Rating'].mean().reset_index()
+
+plt.figure(figsize=(12, 6))
+plt.plot(average_ratings_by_year['Released_Year'], average_ratings_by_year['IMDB_Rating'], marker='o', color='orange')
+plt.title('Average IMDB Ratings Over Time')
+plt.xlabel('Year')
+plt.ylabel('Average IMDB Rating')
+plt.grid()
+plt.xlim(2000, 2024)  # Adjust range to focus on recent years
+plt.xticks(range(2000, 2025))  # Set x-ticks to display years correctly
+plt.show()
 
 
 # 4. Trends in Average Ratings of Popular Movies on Netflix Over Time
@@ -113,7 +178,31 @@
 # In[ ]:
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
 
+warnings.filterwarnings("ignore")
+netflix_data = pd.read_csv('netflix_titles.csv')
+popular_movies = pd.read_csv('popular_movies.csv')
+
+netflix_data['title'] = netflix_data['title'].str.strip()
+popular_movies['title'] = popular_movies['title'].str.strip()
+
+merged_data = pd.merge(netflix_data, popular_movies, on='title', how='inner')
+merged_data = merged_data.dropna(subset=['rating', 'vote_average'])
+merged_data['rating'] = pd.to_numeric(merged_data['rating'], errors='coerce')
+merged_data['vote_average'] = pd.to_numeric(merged_data['vote_average'], errors='coerce')
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=merged_data, x='release_year', y='vote_average', palette='viridis', errorbar=None)  
+plt.title('Average TMDB Ratings of Popular Movies on Netflix by Release Year')
+plt.xlabel('Release Year')
+plt.ylabel('Average TMDB Rating')
+plt.xticks(rotation=45)
+plt.grid()
+plt.show()
 
 
 # # Data Cleaning And Transformations.
@@ -144,6 +233,352 @@
 # 
 # -Computational Resources: Depending on the size of the datasets, training complex models may require significant computational power and time, which could pose logistical challenges.
 
+# # Machine Learning Plan(updated for checkpoint 3)
+
+# 1. What type of machine learning model are you planning to use?
+# 
+# For this project, a supervised learning approach will be used, focusing on:
+# 
+# -Regression Models: To predict continuous variables, such as IMDb or TMDB ratings based on features like genre, runtime, or release year.
+# 
+# -Classification Models: To classify movies into categories, such as "highly-rated" or "low-rated," based on thresholds in ratings.
+# 
+# 2. Challenges anticipated in building the model:
+# 
+# -Imbalanced Dataset: If the classes in the target variable are imbalanced, it could skew the model's performance.
+# 
+# -Feature Engineering: Identifying the most relevant features from categorical data like "genre" or "country" may be complex.
+# 
+# -Insufficient Data: If the merged dataset doesn't have enough records, the model may not generalize well.
+# 
+# -High Dimensionality: Too many features can lead to overfitting, especially with a limited dataset.
+# 
+# 3. Plan to address challenges:
+# 
+# -Use SMOTE (Synthetic Minority Oversampling Technique) for balancing data.
+# 
+# -Conduct recursive feature elimination (RFE) or feature importance analysis to identify relevant features.
+# 
+# -Merge additional datasets, if needed, to improve sample size.
+# 
+# -Apply regularization techniques like Lasso or Ridge to manage high-dimensional data
+
+# # Machine Learning Implementation Process
+
+# **EDA**
+# 
+# 1. Objective: 
+# 
+# -Identify patterns
+# 
+# -missing values
+# 
+# -correlations
+# 
+# -potential outliers.
+# 
+# 2. Steps:
+# 
+# -Summarize data distributions using describe() and identify missing values.
+# 
+# -Visualize missing data percentages using a heatmap (sns.heatmap).
+# 
+# -Explore correlations using a heatmap and scatter plots for numerical data.
+# 
+# -Analyze feature-target relationships using pairplots and residual plots.
+# 
+# -Check class balance for categorical variables (e.g., ratings) using bar plots.
+# 
+# -Visualize numerical feature distributions using histograms or KDE plots.
+# 
+# -Identify outliers with boxplots and decide on handling strategies (e.g., capping or removal).
+# 
+# -Explore temporal trends (e.g., release_year) to detect patterns over time.
+
+# **Prepare**
+# 
+# Splitting the Dataset:
+# 
+# - Justification: An 80/20 train-test split strikes a balance between training the model effectively and evaluating its performance on unseen data. The training set (80%) ensures the model has ample data to learn patterns and relationships, while the test set (20%) provides a robust evaluation of the model’s generalization ability. This ratio is widely used in machine learning projects as it works well for moderately sized datasets.
+# 
+# - Implementation: The split will be performed using the train_test_split function from scikit-learn, which allows for random shuffling to prevent bias in data allocation
+
+# In[ ]:
+
+
+import pandas as pd
+
+imdb_data = pd.read_csv('imdb_top_1000.csv')
+netflix_data = pd.read_csv('netflix_titles.csv')
+popular_movies = pd.read_csv('popular_movies.csv')
+
+imdb_data.rename(columns={'Series_Title': 'title'}, inplace=True)
+netflix_data['title'] = netflix_data['title'].str.strip()
+popular_movies['title'] = popular_movies['title'].str.strip()
+
+merged_data = pd.merge(popular_movies, imdb_data, on='title', how='inner')
+merged_data = pd.merge(merged_data, netflix_data, on='title', how='inner')
+
+columns_to_drop = ['Poster_Link', 'description', 'cast', 'id']  # Adjust as needed
+merged_data.drop(columns=columns_to_drop, inplace=True, errors='ignore')
+
+merged_data.dropna(subset=['IMDB_Rating', 'vote_average', 'release_year'], inplace=True)
+
+merged_data.to_csv('merged_data.csv', index=False)
+
+
+
+# In[19]:
+
+
+from sklearn.model_selection import train_test_split
+
+# Define the target column (e.g., 'IMDB_Rating')
+target_column = 'IMDB_Rating'
+
+# Drop the target column from the features
+X = merged_data.drop(columns=[target_column])
+
+# Define the target variable
+y = merged_data[target_column]
+
+# Split the dataset into training and testing sets (80% training, 20% testing)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Check the shapes of the resulting sets
+print(f"X_train shape: {X_train.shape}, X_test shape: {X_test.shape}")
+print(f"y_train shape: {y_train.shape}, y_test shape: {y_test.shape}")
+
+
+# **Process**
+# 
+# Pipeline Creation:
+# 
+# -Use scikit-learn's Pipeline to integrate preprocessing and modeling steps, ensuring a streamlined, efficient, and reproducible workflow. The pipeline will consist of the following stages:
+# 
+# 1. Missing Data Imputation:
+# 
+# -Employ SimpleImputer to handle missing data. For numerical features, use the median or mean strategy, and for categorical features, the most frequent value will be used for imputation.
+# 
+# 2. Scaling and Normalization:
+# 
+# -Standardize numerical features using StandardScaler to ensure all features are on the same scale, improving the model’s performance and stability.
+# 
+# 3. Categorical Encoding:
+# 
+# -Use OneHotEncoder to convert categorical variables into numerical format. This ensures that machine learning models can interpret categorical data as distinct, non-ordinal features.
+
+# In[ ]:
+
+
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import RFE
+from sklearn.ensemble import RandomForestRegressor  # Use Regressor for continuous target
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+#  Define the features (X) and target (y)
+X = merged_data.drop(columns=['IMDB_Rating'])  
+y = merged_data['IMDB_Rating']  
+
+# Define preprocessing steps for numerical and categorical columns
+numerical_cols = X.select_dtypes(include=['int64', 'float64']).columns
+categorical_cols = X.select_dtypes(include=['object']).columns
+
+# Preprocessing pipelines for numerical and categorical data
+numerical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),  
+    ('scaler', StandardScaler())  
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),  
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))  
+])
+
+#  Combine preprocessing steps using ColumnTransformer
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numerical_transformer, numerical_cols),
+        ('cat', categorical_transformer, categorical_cols)
+    ])
+
+# Define the model (for example, RandomForestRegressor)
+model = RandomForestRegressor(random_state=42) 
+
+# Create a pipeline with preprocessing and model
+pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('model', model)
+])
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#  Fit the pipeline to the training data
+pipeline.fit(X_train, y_train)
+
+# Make predictions
+y_pred = pipeline.predict(X_test)
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, root_mean_squared_error
+
+# For regression, we can use MAE, MSE, RMSE
+
+mae = mean_absolute_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+rmse = root_mean_squared_error(y_test, y_pred)  
+
+print(f"Mean Absolute Error (MAE): {mae:.4f}")
+print(f"Mean Squared Error (MSE): {mse:.4f}")
+print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
+
+
+
+# The code sets up a machine learning pipeline to predict a continuous target variable, `IMDB_Rating`, using a regression model. First, it separates the features (`X`) and target (`y`), and identifies numerical and categorical columns. The preprocessing steps handle missing data by imputing numerical columns with the mean and categorical columns with the most frequent value. Numerical features are standardized using `StandardScaler`, and categorical features are one-hot encoded. The pipeline integrates these preprocessing steps with a `RandomForestRegressor`, a robust model for regression tasks. The data is split into training and testing sets, and the pipeline is fitted to the training data. Predictions are made on the test set, and model performance is evaluated using regression metrics like R², Mean Absolute Error (MAE), Mean Squared Error (MSE), and Root Mean Squared Error (RMSE). This setup ensures that all steps from preprocessing to model evaluation are streamlined and reproducible, offering insights into how well the model predicts the target and highlighting areas for potential improvement.
+
+# **Analyze**
+# 
+# Model Testing and Evaluation
+# 
+# Once the pipeline is set up and data is prepared, the next step is to evaluate multiple models to identify the most effective one for the task. The following models will be assessed:
+# 
+# 1. Linear Regression (for regression tasks):
+# 
+# This basic model predicts continuous outcomes based on a linear relationship between features.
+# 
+# 2. Logistic Regression (for classification tasks):
+# 
+# A common model for binary or multiclass classification tasks, estimating the probability of class membership.
+# 
+# 3. Random Forest:
+# 
+# An ensemble learning method that can be applied to both regression and classification tasks. It is capable of handling complex, non-linear relationships in the data.
+# 
+# 4. Gradient Boosting:
+# 
+# An advanced ensemble technique where decision trees are built sequentially to correct previous models’ errors, resulting in highly accurate predictions.
+
+# In[ ]:
+
+
+import numpy as np
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor  # Regressor for regression tasks
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+models = {
+    'Linear Regression': LinearRegression(),
+    'Random Forest': RandomForestRegressor(random_state=42),  
+    'Gradient Boosting': GradientBoostingRegressor(random_state=42)  
+}
+
+# Define the features (X) and target (y)
+X = merged_data.drop(columns=['IMDB_Rating'])  
+y = merged_data['IMDB_Rating']  
+
+# Define preprocessing steps for numerical and categorical columns
+numerical_cols = X.select_dtypes(include=['int64', 'float64']).columns
+categorical_cols = X.select_dtypes(include=['object']).columns
+
+# Preprocessing pipelines for numerical and categorical data
+numerical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),  
+    ('scaler', StandardScaler())  
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),  
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))  
+])
+
+# Combine preprocessing steps using ColumnTransformer
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numerical_transformer, numerical_cols),
+        ('cat', categorical_transformer, categorical_cols)
+    ])
+
+# Step 1: Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 2: Evaluate models for regression
+for name, model in models.items():
+    # Create the pipeline for each model
+    model_pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('model', model)
+    ])
+    
+    # Train the model
+    model_pipeline.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = model_pipeline.predict(X_test)
+    
+    # Step 3: Evaluate the model
+    if isinstance(model, LinearRegression) or isinstance(model, RandomForestRegressor) or isinstance(model, GradientBoostingRegressor):
+        # Regression metrics
+        print(f"{name} - R^2: {r2_score(y_test, y_pred)}")
+        print(f"{name} - MAE: {mean_absolute_error(y_test, y_pred)}")
+        print(f"{name} - RMSE: {np.sqrt(mean_squared_error(y_test, y_pred))}")
+
+
+# Linear Regression has the lowest MAE (0.3498) and RMSE (0.3498), which suggests that it is performing the best among the three models in terms of predicting the target variable accurately.R^2 nan means that my data is too small for it to predict, I am searching for more datas to add before the next checkpoint.
+
+# # Comparison of Model Performance: MAE and RMSE
+
+# In[27]:
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# Data for the models
+models = ['Linear Regression', 'Random Forest', 'Gradient Boosting']
+mae_values = [0.3498, 0.4360, 0.4451]  # MAE values from your output
+rmse_values = [0.3498, 0.4360, 0.4451]  # RMSE values from your output
+
+# Create a DataFrame to store the results
+model_comparison = pd.DataFrame({
+    'Model': models,
+    'MAE': mae_values,
+    'RMSE': rmse_values
+})
+
+# Set the figure size
+plt.figure(figsize=(10, 6))
+
+# Create two subplots for MAE and RMSE comparison
+fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+
+# Plot MAE bar plot
+sns.barplot(x='Model', y='MAE', data=model_comparison, ax=axes[0], hue='Model', palette='Blues_d', legend=False)
+axes[0].set_title('Mean Absolute Error (MAE) Comparison')
+axes[0].set_ylabel('MAE')
+
+# Plot RMSE bar plot
+sns.barplot(x='Model', y='RMSE', data=model_comparison, ax=axes[1], hue='Model', palette='Reds_d', legend=False)
+axes[1].set_title('Root Mean Squared Error (RMSE) Comparison')
+axes[1].set_ylabel('RMSE')
+
+# Display the plots
+plt.tight_layout()
+plt.show()
+
+
 # ## Approach and Analysis
 # *What is your approach to answering your project question?*
 # *How will you use the identified data to answer your project question?*
@@ -155,7 +590,7 @@
 # *What resources and references have you used for this project?*
 # 📝 <!-- Answer Below -->
 
-# In[12]:
+# In[32]:
 
 
 # ⚠️ Make sure you run this cell at the end of your notebook before every submission!
